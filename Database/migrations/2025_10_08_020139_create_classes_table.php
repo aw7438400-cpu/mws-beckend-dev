@@ -12,35 +12,20 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('classes', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-
-            // Foreign key ke tabel grades
+            $table->string('nisn', 20)->primary();
+            $table->string('photo_id')->nullable();
+            $table->string('full_name');
+            $table->string('nick_name')->nullable();
+            $table->enum('gender', ['Male', 'Female'])->nullable();
+            $table->string('current_status')->nullable();
+            $table->string('student_mws_email')->nullable();
+            $table->string('current_grade')->nullable();
+            $table->string('class_name')->nullable();
+            $table->string('join_academic_year')->nullable();
             $table->uuid('grade_id');
-
-            // Nama kelas
-            $table->string('name', 150);
-
-            // Enum type sesuai rancangan (class_type)
-            $table->enum('grade_level', [
-                'sd',
-                'smp',
-            ])->nullable();
-
-
-            // Timestamp default Laravel (created_at & updated_at)
             $table->timestamps();
-
-            // Soft delete (deleted_at)
             $table->softDeletes();
 
-            // Foreign key constraint
-            $table->foreign('grade_id')
-                ->references('uuid')
-                ->on('grades')
-                ->cascadeOnDelete();
-
-            // Unique constraint untuk kombinasi grade_id dan name
-            $table->unique(['grade_id', 'name'], 'classes_grade_name_unique');
         });
     }
 

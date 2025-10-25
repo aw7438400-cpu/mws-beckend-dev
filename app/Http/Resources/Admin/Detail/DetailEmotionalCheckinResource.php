@@ -9,6 +9,7 @@ class DetailEmotionalCheckinResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+
         $user = $this->whenLoaded('user');
         $contact = $this->whenLoaded('contact');
 

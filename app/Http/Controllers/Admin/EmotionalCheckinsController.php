@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Services\Admin\EmotionalCheckinService;
+use App\Services\EmotionalCheckinService;
 use App\Http\Resources\Admin\Index\EmotionalCheckinResource;
 use App\Http\Requests\Admin\Index\IndexEmotionalCheckinRequest;
 use App\Http\Requests\Admin\Store\StoreEmotionalCheckinRequest;
@@ -44,13 +44,14 @@ class EmotionalCheckinsController extends Controller
      */
     public function store(StoreEmotionalCheckinRequest $request)
     {
+        // 1️⃣ Validasi input
         $data = $request->validated();
 
-        // 1️⃣ Simpan data emotional check-in
+        // 2️⃣ Simpan data emotional check-in
         $result = $this->emotionalCheckinService->createEmotionalCheckin($data);
         $result->load(['user', 'contact']);
 
-        // 2️⃣ Buat notifikasi baru
+        // 3️⃣ Buat notifikasi otomatis
         \App\Models\Notification::create([
             'user_id' => $result->user_id,
             'type' => 'emotional_checkin',
@@ -64,13 +65,17 @@ class EmotionalCheckinsController extends Controller
             'delivered_at' => now(),
         ]);
 
-        // 3️⃣ Kembalikan respons sukses
+        // 4️⃣ Trigger event agar listener bisa kirim notifikasi eksternal (email/AI/whatever)
+        event(new \App\Events\EmotionalCheckinCreated($result));
+
+        // 5️⃣ Return response sukses
         return $this->emotionalCheckinService->success(
             new DetailEmotionalCheckinResource($result),
             200,
             'Created Emotional Check-in Successfully & Notification Sent'
         );
     }
+
 
     /**
      * Display the specified resource.

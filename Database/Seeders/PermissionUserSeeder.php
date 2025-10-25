@@ -199,7 +199,7 @@ class PermissionUserSeeder extends Seeder
 
         $this->command->info('✅ Semua SE Teacher berhasil dibuat dan diberi role SE Teacher.');
 
-        // ================= Student =================
+        // ================= Student Role & Permissions =================
         $studentRole = Role::firstOrCreate(
             ['name' => 'Student', 'guard_name' => $guard],
             ['uuid' => (string) Str::uuid()]
@@ -211,56 +211,43 @@ class PermissionUserSeeder extends Seeder
             'create emotional checkin',
             'update emotional checkin',
             'delete emotional checkin',
-        ])
-            ->where('guard_name', $guard)
-            ->get();
+        ])->where('guard_name', $guard)->get();
 
         $studentRole->givePermissionTo($studentPermissions);
 
+        // ================= Ambil semua kelas =================
         $allClasses = DB::table('classes')->get();
 
-        foreach ($allClasses as $class) {
-            echo "ID: {$class->id}, Name: {$class->name}, Grade Level: {$class->grade_level}\n";
-        }
-
-        $dummyClass = $allClasses->firstWhere('name', 'Kelas SD B');
-
-        if (!$dummyClass) {
-            $this->command->warn('⚠️ Tidak ada data di tabel classes. Jalankan ClassSeeder terlebih dahulu.');
+        if ($allClasses->isEmpty()) {
+            $this->command->warn('⚠️ Tidak ada data di tabel classes. Jalankan ClassStudentsImportSeeder terlebih dahulu.');
             return;
         }
 
-        $students = [
-            ['name' => 'Nafisa Angelica Qurrota Aini', 'email' => 'nafisa@millennia21.id'],
-            ['name' => 'Mikail Rasyefki', 'email' => 'michael@millennia21.id'],
-            ['name' => 'Kenisha Azkayra Prabawa', 'email' => 'kenisha@millennia21.id'],
-            ['name' => 'Aydira Malaika Ridwansyah', 'email' => 'aydira@millennia21.id'],
-            ['name' => 'Prinz Averey Ikhsan', 'email' => 'prinz@millennia21.id'],
-            ['name' => 'Putri Athena Mutiksari', 'email' => 'athena@millennia21.id'],
-            ['name' => 'Dindi Seraphina', 'email' => 'dindi@millennia21.id'],
-            ['name' => 'Gaea Alandra Ardhanny', 'email' => 'gaea.alandra@millennia21.id'],
-            ['name' => 'Aralt Cendekia Wicaksono', 'email' => 'aralt.wicaksono@millennia21.id'],
-            ['name' => 'Muhammad Rafif Cakradinata', 'email' => 'muhammad.rafif@millennia21.id'],
-        ];
+        foreach ($allClasses as $class) {
+            // Gunakan email dari class (student_mws_email) jika ada
+            if (empty($class->student_mws_email)) {
+                continue; // skip kalau email kosong
+            }
 
-        foreach ($students as $student) {
             $studentUser = User::updateOrCreate(
-                ['email' => $student['email']],
+                ['email' => $class->student_mws_email],
                 [
                     'uuid' => (string) Str::uuid(),
-                    'name' => $student['name'],
+                    'name' => $class->full_name,
                     'password' => bcrypt('password123'),
-                    'class_id' => $dummyClass->id,
+                    'class_id' => $class->nisn, // primary key dari classes
                 ]
             );
 
+            // Assign role jika belum punya
             if (!$studentUser->hasRole('Student')) {
                 $studentUser->assignRole($studentRole);
             }
+
+            $this->command->info("✅ User Student dibuat: {$studentUser->name} ({$studentUser->email})");
         }
 
-        $this->command->info('✅ ' . count($students) . ' Student users berhasil dibuat dengan class_id: ' . $dummyClass->id);
-
+        $this->command->info('✅ Semua student user berhasil dibuat berdasarkan tabel classes.');
         // ================= Parent =================
         $parentRole = Role::firstOrCreate(
             ['name' => 'Parent', 'guard_name' => $guard],

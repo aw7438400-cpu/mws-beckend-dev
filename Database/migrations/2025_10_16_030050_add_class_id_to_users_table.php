@@ -6,28 +6,24 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->uuid('class_id')->nullable()->after('id');
+            // samakan tipe dengan classes.nisn
+            $table->string('class_id', 20)->nullable()->after('id');
 
-            // Tambahkan foreign key constraint ke tabel classes
+            // tambahkan FK ke classes.nisn
             $table->foreign('class_id')
-                ->references('id')
+                ->references('nisn')
                 ->on('classes')
-                ->cascadeOnDelete(); // jika class dihapus, user yang terkait ikut dihapus opsional
+                ->cascadeOnDelete();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
+            // drop FK lalu kolom
             $table->dropForeign(['class_id']);
             $table->dropColumn('class_id');
         });

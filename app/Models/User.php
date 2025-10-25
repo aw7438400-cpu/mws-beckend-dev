@@ -68,8 +68,10 @@ class User extends Authenticatable
 
     public function class()
     {
-        return $this->belongsTo(Clasess::class, 'class_id', 'id');
+        // class_id di users menunjuk ke nisn di tabel classes
+        return $this->belongsTo(Clasess::class, 'class_id', 'nisn');
     }
+
 
 
     public function teachingClasses()

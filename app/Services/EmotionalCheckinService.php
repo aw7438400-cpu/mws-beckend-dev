@@ -1,12 +1,14 @@
 <?php
 
-namespace App\Services\Admin;
+namespace App\Services;
 
+use App\Models\User;
 use App\Models\EmotionalCheckin;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use App\Services\Admin\AiAnalysisService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class EmotionalCheckinService
 {
@@ -62,38 +64,58 @@ class EmotionalCheckinService
     public function createEmotionalCheckin(array $data)
     {
         DB::beginTransaction();
+
         try {
-            // 🟡 Deteksi jika contact_id dikirim kosong
-            if (!isset($data['contact_id']) || $data['contact_id'] === '' || $data['contact_id'] === null) {
-                $data['contact_id'] = 'no_need';
+            $authUser = Auth::user();
+
+            // ✅ Pastikan user login valid
+            if (!$authUser) {
+                abort(401, 'User belum login.');
             }
 
-            // 🧠 Tangani multiple mood
-            $moodInput = $data['mood'] ?? null;
+            // 🟢 Handle user_id khusus student
+            if ($authUser->role === 'student') {
+                // cari berdasarkan class_id (atau NISN)
+                $student = User::where('class_id', $authUser->class_id)->first();
 
+                if (!$student) {
+                    abort(404, 'Student tidak ditemukan di tabel users.');
+                }
+
+                // gunakan UUID dari student yang ditemukan
+                $data['user_id'] = $student->uuid;
+            } else {
+                // 🟣 Untuk teacher/staff → pakai UUID login
+                $data['user_id'] = $authUser->uuid;
+            }
+
+            // 🟡 Handle contact_id kosong
+            $data['contact_id'] = $data['contact_id'] ?? 'no_need';
+
+            // 🧠 Tangani multiple mood (string jadi array)
+            $moodInput = $data['mood'] ?? null;
             if (is_string($moodInput)) {
-                // Jika dikirim "happy neutral" atau "happy, neutral"
                 $moodInput = preg_split('/[\s,]+/', trim($moodInput));
             }
-
             if (empty($moodInput)) {
                 $moodInput = null;
             }
 
+            // 🧩 Insert check-in (foreign key ke users.uuid sudah aman)
             $checkin = EmotionalCheckin::create([
                 'user_id' => $data['user_id'],
-                'role' => $data['role'],
-                'mood' => $moodInput, // sekarang bisa array
+                'role' => $data['role'] ?? $authUser->role,
+                'mood' => $moodInput,
                 'internal_weather' => $data['internal_weather'] ?? null,
-                'presence_level' => $data['presence_level'],
-                'capasity_level' => $data['capasity_level'],
+                'presence_level' => $data['presence_level'] ?? null,
+                'capasity_level' => $data['capasity_level'] ?? null,
                 'note' => $data['note'] ?? null,
-                'checked_in_at' => $data['checked_in_at'],
+                'checked_in_at' => $data['checked_in_at'] ?? now(),
                 'energy_level' => $data['energy_level'] ?? null,
                 'balance' => $data['balance'] ?? null,
                 'load' => $data['load'] ?? null,
                 'readiness' => $data['readiness'] ?? null,
-                'contact_id' => $data['contact_id'] ?? $this->mapContactId($data),
+                'contact_id' => $data['contact_id'],
             ]);
 
             DB::commit();
@@ -103,9 +125,8 @@ class EmotionalCheckinService
             throw $th;
         }
 
-        // 🧠 AI Analysis
+        // 🧠 AI Analysis tetap seperti sebelumnya
         try {
-            // ubah array jadi teks agar bisa dibaca oleh AI
             $moodText = is_array($checkin->mood) ? implode(', ', $checkin->mood) : $checkin->mood;
             $analysis = $this->aiService->analyzeMood($moodText, $checkin->note);
 
@@ -119,6 +140,7 @@ class EmotionalCheckinService
 
         return $checkin->fresh(['user.class', 'contact']);
     }
+
 
 
     public function findByUuidWithRelation(string $id, array $relations = [])

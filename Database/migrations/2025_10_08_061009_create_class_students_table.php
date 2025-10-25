@@ -1,51 +1,47 @@
-<?php
+ <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
+    use Illuminate\Database\Migrations\Migration;
+    use Illuminate\Database\Schema\Blueprint;
+    use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
+    return new class extends Migration
     {
-        Schema::create('class_students', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+        public function up(): void
+        {
+            Schema::create('class_students', function (Blueprint $table) {
+                $table->engine = 'InnoDB';
 
-            // Foreign keys
-            $table->uuid('class_id');
-            $table->uuid('student_id');
+                $table->uuid('id')->primary();
 
-            $table->timestamp('enrolled_at')->nullable();
-            $table->enum('status', ['enrolled', 'dropped', 'completed'])
-                ->default('enrolled')
-                ->comment('Status keikutsertaan siswa di kelas');
+                // classes.primary = string('nisn', 20)
+                $table->string('class_id', 20);
 
-            $table->timestamps();
-            $table->softDeletes();
+                // users.pk = uuid (sesuaikan kalau users pakai id numeric)
+                $table->uuid('student_id');
 
-            $table->unique(['class_id', 'student_id']);
+                $table->timestamp('enrolled_at')->nullable();
+                $table->enum('status', ['enrolled', 'dropped', 'completed'])
+                    ->default('enrolled')
+                    ->comment('Status keikutsertaan siswa di kelas');
 
-            // Foreign key constraints
-            $table->foreign('class_id')
-                ->references('id')      // harus sesuai pk di classes
-                ->on('classes')
-                ->cascadeOnDelete();
+                $table->timestamps();
+                $table->softDeletes();
 
-            $table->foreign('student_id')
-                ->references('uuid')    // sesuai pk di users
-                ->on('users')
-                ->cascadeOnDelete();
-        });
-    }
+                $table->unique(['class_id', 'student_id'], 'class_student_unique');
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::dropIfExists('class_students');
-    }
-};
+                // foreign keys
+                $table->foreign('class_id')
+                    ->references('nisn')->on('classes')
+                    ->cascadeOnDelete();
+
+                $table->foreign('student_id')
+                    ->references('uuid')->on('users')
+                    ->cascadeOnDelete();
+            });
+        }
+
+        public function down(): void
+        {
+            Schema::dropIfExists('class_students');
+        }
+    };

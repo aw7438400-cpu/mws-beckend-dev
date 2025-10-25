@@ -1,9 +1,14 @@
 <?php
 
+use Illuminate\Http\Request;
+use App\Models\EmotionalCheckin;
+
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\GoogleAuthController;
+use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\EmotionalCheckinsController;
 
 Route::post('login', [AuthController::class, 'login']);
@@ -35,3 +40,9 @@ Route::controller(EmotionalCheckinsController::class)
         Route::patch('emotional-checkin/{uuid}', 'update')->middleware('permission:update emotional checkin');
         Route::delete('emotional-checkin/{id}', 'destroy')->middleware('permission:delete emotional checkin');
     });
+
+
+Route::post('/send-emotional-checkin/{checkin}', function (Request $request, $checkin) {
+    $checkin = EmotionalCheckin::findOrFail($checkin);
+    return app(NotificationController::class)->sendToSelected($checkin);
+});
