@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\SlackTestController;
 use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\EmotionalCheckinsController;
@@ -46,3 +47,5 @@ Route::post('/send-emotional-checkin/{checkin}', function (Request $request, $ch
     $checkin = EmotionalCheckin::findOrFail($checkin);
     return app(NotificationController::class)->sendToSelected($checkin);
 });
+
+Route::post('/slack/test', [SlackTestController::class, 'sendNotification']);

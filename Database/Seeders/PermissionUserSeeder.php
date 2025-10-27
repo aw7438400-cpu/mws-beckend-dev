@@ -307,6 +307,7 @@ class PermissionUserSeeder extends Seeder
             ['email' => 'kiki@millennia21.id', 'name' => 'Rizki Amalia Fatikhah'],
             ['email' => 'ian.ahmad@millennia21.id', 'name' => 'Ian Ahmad Fauzi'],
             ['email' => 'andre@millennia21.id', 'name' => 'Andrean Hadinata'],
+            ['email' => 'muhammad.farhan@millennia21.id', 'name' => 'muhammad farhan'],
         ];
 
         // Buat user Staff satu per satu

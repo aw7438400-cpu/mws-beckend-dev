@@ -66,7 +66,7 @@ class EmotionalCheckinsController extends Controller
         ]);
 
         // 4️⃣ Trigger event agar listener bisa kirim notifikasi eksternal (email/AI/whatever)
-        event(new \App\Events\EmotionalCheckinCreated($result));
+        event(new \App\Events\EmotionalCheckinCreated($result->fresh(['user', 'contact'])));
 
         // 5️⃣ Return response sukses
         return $this->emotionalCheckinService->success(
@@ -75,7 +75,6 @@ class EmotionalCheckinsController extends Controller
             'Created Emotional Check-in Successfully & Notification Sent'
         );
     }
-
 
     /**
      * Display the specified resource.

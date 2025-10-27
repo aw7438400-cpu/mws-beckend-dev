@@ -39,9 +39,8 @@ return [
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_TOKEN'),
-            'channel' => env('SLACK_DEFAULT_CHANNEL', '#general'),
+            'channel' => env('SLACK_CHANNEL'),
         ],
-        'webhook_url' => env('SLACK_WEBHOOK_URL'),
     ],
 
 ];

@@ -36,6 +36,7 @@ class EmotionalCheckin extends Model
         'presence_level' => 'integer',
         'capasity_level' => 'integer',
         'mood' => 'array',
+        'note' => 'string',
     ];
 
     /**
@@ -72,6 +73,7 @@ class EmotionalCheckin extends Model
     }
 
 
+    
 
     /**
      * Relasi ke contact/penanggung jawab
@@ -84,7 +86,7 @@ class EmotionalCheckin extends Model
     /**
      * Accessor untuk memastikan nilai 'no_need' dikembalikan apa adanya
      */
-    public function getContactAttribute()
+    public function getContactInfoAttribute()
     {
         if ($this->contact_id === 'no_need') {
             return ['id' => 'no_need', 'name' => 'No Need'];
