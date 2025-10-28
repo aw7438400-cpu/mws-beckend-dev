@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('emotional_checkins', function (Blueprint $table) {
-            $table->text('ai_analysis')->nullable()->after('note');
+            $table->json('ai_analysis')->nullable()->after('note');
         });
     }
 

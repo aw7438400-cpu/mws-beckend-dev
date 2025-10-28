@@ -51,30 +51,54 @@ class EmotionalCheckinsController extends Controller
         $result = $this->emotionalCheckinService->createEmotionalCheckin($data);
         $result->load(['user', 'contact']);
 
-        // 3️⃣ Buat notifikasi otomatis
+        // 3️⃣ Jalankan analisis AI (harian + historis)
+        $aiService = new \App\Services\Admin\AiAnalysisService();
+
+        // Analisis harian
+        $daily = $aiService->analyzeDaily(
+            is_array($result->mood) ? implode(', ', $result->mood) : $result->mood,
+            $result->note
+        );
+
+        // Analisis historis/prediktif
+        $trend = $aiService->analyzeTrends((int) $result->user_id);
+
+
+        // Gabungkan hasil analisis
+        $analysis = [
+            'daily' => json_decode($daily, true),
+            'trend' => json_decode($trend, true),
+        ];
+
+        // Simpan ke kolom ai_analysis
+        $result->ai_analysis = json_encode($analysis, JSON_UNESCAPED_UNICODE);
+        $result->save();
+
+        // 4️⃣ Buat notifikasi otomatis dengan hasil analisis AI
         \App\Models\Notification::create([
             'user_id' => $result->user_id,
-            'type' => 'emotional_checkin',
+            'type' => 'emotional_analysis',
             'payload' => [
                 'mood' => $result->mood,
                 'note' => $result->note,
-                'checked_in_at' => $result->checked_in_at,
+                'ai_analysis' => $analysis,
             ],
             'is_read' => false,
             'expired_at' => now()->addDays(7),
             'delivered_at' => now(),
         ]);
 
-        // 4️⃣ Trigger event agar listener bisa kirim notifikasi eksternal (email/AI/whatever)
+        // 5️⃣ Trigger event untuk listener eksternal (Slack, Email, dsb)
         event(new \App\Events\EmotionalCheckinCreated($result->fresh(['user', 'contact'])));
 
-        // 5️⃣ Return response sukses
+        // 6️⃣ Return response sukses
         return $this->emotionalCheckinService->success(
             new DetailEmotionalCheckinResource($result),
             200,
-            'Created Emotional Check-in Successfully & Notification Sent'
+            'Created Emotional Check-in Successfully & Predictive Analysis Generated'
         );
     }
+
 
     /**
      * Display the specified resource.

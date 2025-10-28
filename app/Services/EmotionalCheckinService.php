@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class EmotionalCheckinService
 {
-    protected AiAnalysisService $aiService;
+    protected $aiService;
 
     public function __construct(AiAnalysisService $aiService)
     {
@@ -125,12 +125,12 @@ class EmotionalCheckinService
             throw $th;
         }
 
-        // 🧠 AI Analysis tetap seperti sebelumnya
+        // 🧠 AI Analysis dengan data historis (prediktif)
         try {
             $moodText = is_array($checkin->mood) ? implode(', ', $checkin->mood) : $checkin->mood;
-            $analysis = $this->aiService->analyzeMood($moodText, $checkin->note);
+            $analysis = $this->aiService->analyzeMood($moodText, $checkin->note, (int) $checkin->user_id);
 
-            if ($analysis && !str_contains($analysis, 'Gagal')) {
+            if ($analysis && !str_contains($analysis, 'Failed')) {
                 $checkin->ai_analysis = $analysis;
                 $checkin->save();
             }

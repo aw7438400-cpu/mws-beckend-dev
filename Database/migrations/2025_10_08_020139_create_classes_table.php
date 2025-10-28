@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('classes', function (Blueprint $table) {
             $table->string('nisn', 20)->primary();
-            $table->string('photo_id')->nullable();
+            $table->text('photo_link')->nullable();
             $table->string('full_name');
             $table->string('nick_name')->nullable();
             $table->enum('gender', ['Male', 'Female'])->nullable();

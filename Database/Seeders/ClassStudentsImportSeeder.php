@@ -29,7 +29,7 @@ class ClassStudentsImportSeeder extends Seeder
 
             [
                 $nisn,
-                $photo_id,
+                $photo_link,
                 $full_name,
                 $nick_name,
                 $gender,
@@ -53,7 +53,7 @@ class ClassStudentsImportSeeder extends Seeder
             DB::table('classes')->updateOrInsert(
                 ['nisn' => $nisn],
                 [
-                    'photo_id' => $photo_id ?: null,
+                    'photo_link' => $photo_link ?: null,
                     'full_name' => $full_name,
                     'nick_name' => $nick_name ?: null,
                     'gender' => $gender,

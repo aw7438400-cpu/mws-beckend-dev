@@ -25,12 +25,14 @@ class DetailEmotionalCheckinResource extends JsonResource
             'presence_level' => $this->presence_level,
             'capasity_level' => $this->capasity_level,
             'note' => $this->note,
-            'contact' => $contact ?? ($this->contact_id === 'no_need' ? ['id' => 'no_need', 'name' => 'No Need'] : null),
+            'contact' => $contact ?? ($this->contact_id === 'no_need'
+                ? ['id' => 'no_need', 'name' => 'No Need']
+                : null),
             'checked_in_at' => $this->checked_in_at,
             'ai_analysis' => $this->ai_analysis ?? null,
         ];
 
-        // Hanya non-student yang punya atribut tambahan
+        // Hanya untuk non-student: atribut tambahan
         if ($this->role !== 'student') {
             $baseData['internal_weather'] = $this->internal_weather ?? null;
             $baseData['energy_level'] = $this->energy_level ?? null;
@@ -39,17 +41,23 @@ class DetailEmotionalCheckinResource extends JsonResource
             $baseData['readiness'] = $this->readiness ?? null;
         }
 
-        // Tambahkan info class jika student
-        if ($this->role === 'student' && $user && $user->class) {
+        // Untuk student: ambil data class dari tabel classes
+        if ($this->role === 'student' && $user && $user->studentClass) {
             $baseData['class'] = [
-                'id' => $user->class->id,
-                'name' => $user->class->name,
-                'grade_level' => $user->class->grade_level,
-                
+                'id' => $user->studentClass->grade_id ?? null,
+                'name' => $user->studentClass->class_name ?? null,
+                'grade_level' => $user->studentClass->current_grade ?? null,
+            ];
+        } else {
+            // Untuk non-student: gunakan data lama
+            $baseData['class'] = [
+                'id' => $user->class_id ?? null,
+                'name' => $user->class_name ?? null,
+                'grade_level' => $user->grade_level ?? null,
             ];
         }
 
-        // Tambahkan info user umum
+        // Tambahkan data user umum
         $baseData['user'] = [
             'id' => $user->id ?? null,
             'name' => $user->name ?? null,

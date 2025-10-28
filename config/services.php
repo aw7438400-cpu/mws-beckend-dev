@@ -34,13 +34,22 @@ return [
         'redirect' => config ('app.url'). '/auth-google-calback',
     ],
 
-
-
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_TOKEN'),
-            'channel' => env('SLACK_CHANNEL'),
+            'user_map' => [
+                607 => 'U09GKDAL7GX',    
+                633 => 'UPJEPKH8D',      
+                2 => 'U05RH1086UB',
+                3 => 'U05R1D18LTH',
+                4 => 'U05QQ7WB22K',
+                5 => 'U05SH2113AP',
+                6 => 'U08BEP8LU3V',
+                7 => 'U06C5BY1YT1',
+                8 => 'U05RUL0FGR3',
+                9 => 'U05RMHRJCTD',
+                10 => 'U079EU31GGK',
+            ],
         ],
     ],
-
 ];
