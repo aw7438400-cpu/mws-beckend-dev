@@ -12,10 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('emotional_checkins', function (Blueprint $table) {
-            $table->renameColumn('contact_id', 'contact_id_old');
+            if (Schema::hasColumn('emotional_checkins', 'contact_id')) {
+                $table->renameColumn('contact_id', 'contact_id_old');
+            }
         });
+
         Schema::table('emotional_checkins', function (Blueprint $table) {
-            $table->string('contact_id')->nullable()->after('contact_id_old');
+            // ubah ke TEXT supaya bisa tampung banyak teks (misalnya “Mentor, Counselor, HR”)
+            $table->text('contact_id')->nullable()->after('contact_id_old');
         });
     }
 
@@ -25,13 +29,15 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('emotional_checkins', function (Blueprint $table) {
-            Schema::table('emotional_checkins', function (Blueprint $table) {
+            if (Schema::hasColumn('emotional_checkins', 'contact_id')) {
                 $table->dropColumn('contact_id');
-            });
+            }
+        });
 
-            Schema::table('emotional_checkins', function (Blueprint $table) {
+        Schema::table('emotional_checkins', function (Blueprint $table) {
+            if (Schema::hasColumn('emotional_checkins', 'contact_id_old')) {
                 $table->renameColumn('contact_id_old', 'contact_id');
-            });
+            }
         });
     }
 };

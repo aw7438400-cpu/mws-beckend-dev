@@ -80,4 +80,34 @@ class User extends Authenticatable
             ->withPivot(['role'])
             ->withTimestamps();
     }
+
+    public function assessmentsCreated()
+    {
+        return $this->hasMany(Assessment::class, 'created_by');
+    }
+
+    public function assessmentResponses()
+    {
+        return $this->hasMany(AssessmentResponse::class, 'student_id');
+    }
+
+    public function baselineReports()
+    {
+        return $this->hasMany(BaselineReport::class, 'student_id');
+    }
+
+    public function interventionAssignments()
+    {
+        return $this->hasMany(InterventionAssignment::class, 'student_id');
+    }
+
+    public function assignedInterventions()
+    {
+        return $this->hasMany(InterventionAssignment::class, 'assigned_by');
+    }
+
+    public function progressUpdates()
+    {
+        return $this->hasMany(ProgressUpdate::class, 'updated_by');
+    }
 }

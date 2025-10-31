@@ -536,7 +536,7 @@ class PermissionUserSeeder extends Seeder
             ['email' => 'anggie@millennia21.id', 'name' => 'Anggie Ayu Setya Pradini, S.Pd'],
             ['email' => 'annisa@millennia21.id', 'name' => 'Annisa Fitri Tanjung'],
             ['email' => 'devilarasati@millennia21.id', 'name' => 'Devi Larasati'],
-            // ... lanjutkan semua data SE Teacher lama
+
         ];
 
         foreach ($therapistData as $therapist) {

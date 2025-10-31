@@ -1,8 +1,9 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration {
     public function up(): void
@@ -12,7 +13,7 @@ return new class extends Migration {
 
         // permissions
         Schema::create($tableNames['permissions'], function (Blueprint $table) {
-            $table->uuid('uuid')->primary();
+            $table->uuid('uuid')->primary()->default(DB::raw('(UUID())'));
             $table->string('name');
             $table->string('guard_name');
             $table->timestamps();
@@ -21,7 +22,7 @@ return new class extends Migration {
 
         // roles
         Schema::create($tableNames['roles'], function (Blueprint $table) {
-            $table->uuid('uuid')->primary();
+            $table->uuid('uuid')->primary()->default(DB::raw('(UUID())'));
             $table->string('name');
             $table->string('guard_name');
             $table->timestamps();
@@ -32,7 +33,7 @@ return new class extends Migration {
         Schema::create($tableNames['model_has_permissions'], function (Blueprint $table) use ($tableNames, $columnNames) {
             $table->uuid($columnNames['permission_pivot_key']); // permission_uuid
             $table->string('model_type');
-            $table->unsignedBigInteger($columnNames['model_morph_key']); // user_id integer
+            $table->string($columnNames['model_morph_key']); // model_uuid as string
             $table->index([$columnNames['model_morph_key'], 'model_type'], 'model_has_permissions_model_id_model_type_index');
             $table->foreign($columnNames['permission_pivot_key'])
                 ->references('uuid')
@@ -45,7 +46,7 @@ return new class extends Migration {
         Schema::create($tableNames['model_has_roles'], function (Blueprint $table) use ($tableNames, $columnNames) {
             $table->uuid($columnNames['role_pivot_key']); // role_uuid
             $table->string('model_type');
-            $table->unsignedBigInteger($columnNames['model_morph_key']); // user_id integer
+            $table->char($columnNames['model_morph_key'], 36);
             $table->index([$columnNames['model_morph_key'], 'model_type'], 'model_has_roles_model_id_model_type_index');
             $table->foreign($columnNames['role_pivot_key'])
                 ->references('uuid')
