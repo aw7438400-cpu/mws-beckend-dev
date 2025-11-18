@@ -3,25 +3,30 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Intervention extends Model
 {
-    use HasFactory, SoftDeletes;
-
+    use SoftDeletes;
     public $incrementing = false;
     protected $keyType = 'string';
-
-    protected $fillable = ['id', 'name', 'description', 'default_duration_days', 'recommended_for'];
-
-    protected $casts = [
-        'recommended_for' => 'array',
-    ];
-
-    public function assignments(): HasMany
+    protected $fillable = ['id', 'student_id', 'group_code', 'intervention_type', 'strategy', 'progress_status', 'notes', 'created_by'];
+    public function student()
     {
-        return $this->hasMany(InterventionAssignment::class);
+        return $this->belongsTo(Student::class, 'student_id');
+    }
+    public function creator()
+    {
+        return $this->belongsTo(Teacher::class, 'created_by');
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+        static::creating(function ($model) {
+            if (!$model->id) {
+                $model->id = (string) \Illuminate\Support\Str::uuid();
+            }
+        });
     }
 }

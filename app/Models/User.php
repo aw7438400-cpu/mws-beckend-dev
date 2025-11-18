@@ -110,4 +110,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(ProgressUpdate::class, 'updated_by');
     }
+
+    public function mentor()
+    {
+        return $this->hasOne(Mentor::class);
+    }
+
+    public function students()
+    {
+        return $this->hasMany(Student::class, 'mentor_id');
+    }
 }

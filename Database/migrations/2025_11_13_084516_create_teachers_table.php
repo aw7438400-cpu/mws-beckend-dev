@@ -11,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('interventions', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+        Schema::create('teachers', function (Blueprint $table) {
+            $table->id();
             $table->string('name');
-            $table->text('description')->nullable();
-            $table->integer('default_duration_days')->nullable();
-            $table->json('recommended_for')->nullable(); // e.g. ["tier2"]
+            $table->string('email')->unique();
+            $table->string('role')->default('teacher'); // opsional
             $table->timestamps();
             $table->softDeletes();
         });
@@ -27,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('interventions');
+        Schema::dropIfExists('teachers');
     }
 };

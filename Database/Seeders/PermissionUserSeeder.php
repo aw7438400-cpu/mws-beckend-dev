@@ -229,15 +229,20 @@ class PermissionUserSeeder extends Seeder
                 continue; // skip kalau email kosong
             }
 
-            $studentUser = User::updateOrCreate(
+            $studentUser = User::firstOrCreate(
                 ['email' => $class->student_mws_email],
                 [
                     'uuid' => (string) Str::uuid(),
                     'name' => $class->full_name,
                     'password' => bcrypt('password123'),
-                    'class_id' => $class->nisn, // primary key dari classes
+                    'class_id' => $class->nisn,
                 ]
             );
+
+            $studentUser->update([
+                'name' => $class->full_name,
+                'class_id' => $class->nisn,
+            ]);
 
             // Assign role jika belum punya
             if (!$studentUser->hasRole('Student')) {

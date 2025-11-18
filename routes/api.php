@@ -7,10 +7,19 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\MentorController;
+use App\Http\Controllers\Admin\StudentController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\SlackTestController;
 use App\Http\Controllers\Auth\GoogleAuthController;
+use App\Http\Controllers\Admin\ClassStudentController;
+use App\Http\Controllers\Admin\InterventionController;
 use App\Http\Controllers\Admin\NotificationController;
+use App\Http\Controllers\admin\TeacherStudentController;
 use App\Http\Controllers\Admin\EmotionalCheckinsController;
+
+
+
 
 Route::post('login', [AuthController::class, 'login']);
 Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
@@ -49,3 +58,15 @@ Route::post('/send-emotional-checkin/{checkin}', function (Request $request, $ch
 });
 
 Route::post('/slack/test', [SlackTestController::class, 'sendNotification']);
+
+Route::middleware('auth:sanctum')->group(function () {
+
+    Route::get('/dashboard', [DashboardController::class, 'index']);
+
+    Route::apiResource('students', StudentController::class);
+
+    Route::get('/mentors', [MentorController::class, 'index']);
+    Route::post('/mentors/{id}/assign-student', [MentorController::class, 'assignStudent']);
+
+    Route::post('/interventions', [InterventionController::class, 'store']);
+});
