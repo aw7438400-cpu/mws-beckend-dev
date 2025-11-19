@@ -9,10 +9,12 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\MentorController;
 use App\Http\Controllers\Admin\StudentController;
+use App\Http\Controllers\Admin\StrategyController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\SlackTestController;
 use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\Admin\ClassStudentController;
+use App\Http\Controllers\Admin\GamificationController;
 use App\Http\Controllers\Admin\InterventionController;
 use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\admin\TeacherStudentController;
@@ -69,4 +71,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/mentors/{id}/assign-student', [MentorController::class, 'assignStudent']);
 
     Route::post('/interventions', [InterventionController::class, 'store']);
+    Route::post('/interventions/group', [InterventionController::class, 'storeGroup']);
+
+    Route::get('/strategies', [StrategyController::class, 'index']);            // teacher & admin
+    Route::post('/strategies', [StrategyController::class, 'store']);           // admin only
+    Route::put('/strategies/{id}', [StrategyController::class, 'update']);     // admin only
+    Route::delete('/strategies/{id}', [StrategyController::class, 'destroy']); // admin only
+
+    Route::get('/gamification/profile', [GamificationController::class, 'profile']);
+    Route::post('/gamification/checkin', [GamificationController::class, 'checkin']);
 });
