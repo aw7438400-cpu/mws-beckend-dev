@@ -13,7 +13,11 @@ class MentorController extends Controller
 {
     public function index()
     {
-        return Mentor::with('user')->get();
+        $mentors = Teacher::all();
+        return response()->json([
+            'message' => 'Successfully retrieved mentors data',
+            'data' => $mentors
+        ]);
     }
 
     public function assignStudent(Request $request, $id)

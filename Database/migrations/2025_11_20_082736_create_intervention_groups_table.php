@@ -11,14 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('strategies', function (Blueprint $table) {
+        Schema::create('intervention_groups', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
+            $table->string('group_name');
             $table->text('description')->nullable();
-            $table->string('category')->nullable(); // e.g. behaviour, academic
-            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
-            $table->boolean('is_public')->default(true);
+
+            // guru pembuat intervensi
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->foreign('created_by')->references('id')->on('users')->nullOnDelete();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -27,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('strategies');
+        Schema::dropIfExists('intervention_groups');
     }
 };

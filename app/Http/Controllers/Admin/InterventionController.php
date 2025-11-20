@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\Admin;
 
+use id;
 use App\Models\Activity;
+use Illuminate\Http\Request;
+use App\Models\InterventionGroup;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use App\Services\InterventionService;
 use App\Http\Requests\Admin\Store\StoreInterventionRequest;
-use Illuminate\Support\Facades\Auth;
 
 class InterventionController extends Controller
 {
@@ -36,6 +39,30 @@ class InterventionController extends Controller
             'message' => 'Intervention created successfully',
             'intervention' => $intervention,
             'activity' => $activity,
+        ], 201);
+    }
+
+    public function storeGroup(Request $request)
+    {
+        $validated = $request->validate([
+            'group_name' => 'required|string',
+            'description' => 'nullable|string',
+            'student_ids' => 'required|array',
+            'student_ids.*' => 'exists:students,id',
+        ]);
+
+        $group = InterventionGroup::create([
+            'group_name' => $validated['group_name'],
+            'description' => $validated['description'] ?? null,
+            'created_by' => Auth::id(),
+        ]);
+
+        // Attach students
+        $group->students()->sync($validated['student_ids']);
+
+        return response()->json([
+            'message' => 'Group intervention created successfully',
+            'data' => $group
         ], 201);
     }
 }
