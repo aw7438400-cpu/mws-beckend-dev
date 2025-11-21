@@ -26,8 +26,8 @@ use App\Http\Controllers\Admin\EmotionalCheckinsController;
 Route::post('login', [AuthController::class, 'login']);
 Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
-Route::get('/auth-google-redirect', [AuthController::class, 'google_redirect']);
-Route::get('/auth-google-callback', [AuthController::class, 'google_callback']);
+Route::get('/auth/google', [AuthController::class, 'google_redirect']);
+Route::get('/auth/google/callback', [AuthController::class, 'google_callback']);
 Route::post('auth/google/token', [AuthController::class, 'loginWithToken']);
 
 Route::controller(UserController::class)->group(function () {
