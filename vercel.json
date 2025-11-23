@@ -9,7 +9,8 @@
             "src": "package.json",
             "use": "@vercel/static-build",
             "config": {
-                "distDir": "public/build"
+                "distDir": "public/build",
+                "zeroConfig": true
             }
         }
     ],
@@ -31,5 +32,6 @@
             "memory": 1024,
             "maxDuration": 10
         }
-    }
+    },
+    "outputDirectory": "public/build"
 }
