@@ -4,6 +4,7 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
+        "build": "echo 'Build skipped – assets already committed'",
         "build:prod": "vite build"
     },
     "devDependencies": {
