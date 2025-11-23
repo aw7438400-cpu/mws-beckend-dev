@@ -2,11 +2,13 @@
     "$schema": "https://json.schemastore.org/package.json",
     "private": true,
     "type": "module",
-    "scripts": {
-        "dev": "vite",
-        "build": "echo 'Build skipped – assets already committed'",
-        "build:prod": "vite build"
-    },
+    {
+        "scripts": {
+            "dev": "vite",
+            "build": "echo \"Build skipped – assets pre-committed for Vercel\"",
+            "build:prod": "vite build"
+        }
+    }
     "devDependencies": {
         "@tailwindcss/vite": "^4.0.0",
         "axios": "^1.11.0",
