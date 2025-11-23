@@ -1,0 +1,26 @@
+{
+    "version": 2,
+    "builds": [
+        {
+            "src": "api/index.php",
+            "use": "vercel-php@0.8.0"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/build/(.*)",
+            "continue": true
+        },
+        {
+            "src": "/(.*)",
+            "dest": "/api/index.php"
+        }
+    ],
+    "env": {
+        "APP_ENV": "production",
+        "APP_DEBUG": "false",
+        "SESSION_DRIVER": "cookie",
+        "CACHE_DRIVER": "redis",
+        "VIEW_COMPILED_PATH": "/tmp/storage/framework/views"
+    }
+}
